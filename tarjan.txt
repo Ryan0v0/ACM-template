@@ -1,0 +1,39 @@
+int n,cnt,tot,ti,top,head[maxn],low[maxn],dfn[maxn],scc[maxn],sta[maxn],s[maxn];
+struct edge{int go,next;}e[maxm];
+void insert(int x,int y)
+{
+	e[++tot].go=y;e[tot].next=head[x];head[x]=tot;
+}
+void dfs(int x)
+{
+	int y;
+	low[x]=dfn[x]=++ti;sta[++top]=x;
+	for(int i=head[x];i;i=e[i].next)
+	 if (!dfn[y=e[i].go])
+	  {
+	  	dfs(y);
+	  	low[x]=min(low[x],low[y]);
+	  }
+	 else if(!scc[y])low[x]=min(low[x],dfn[y]);
+	if(low[x]==dfn[x])
+	{
+		cnt++;
+		while(1)
+                 {
+                  scc[y=sta[top--]]=cnt;s[cnt]++;
+                  if(y==x)break;
+                 }
+	}  
+}
+void tarjan()
+{
+	for(int i=1;i<=n;i++)if(!dfn[i])dfs(i);
+}
+int main()
+{
+	freopen("input.txt","r",stdin);
+	freopen("output.txt","w",stdout);
+	
+	tarjan();
+	return 0;
+}

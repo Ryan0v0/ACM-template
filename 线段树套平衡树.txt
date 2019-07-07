@@ -1,0 +1,134 @@
+int n,m,tot,a[maxn],l[maxm],r[maxm],s[maxm],rnd[maxm],w[maxm],v[maxm];
+struct rec{int l,r,rt;}t[4*maxn];
+inline void pushup(int k)
+{s[k]=s[l[k]]+s[r[k]]+w[k];}
+inline void rturn(int &k)
+{int t=l[k];l[k]=r[t];r[t]=k;s[t]=s[k];pushup(k);k=t;}
+inline void lturn(int &k)
+{int t=r[k];r[k]=l[t];l[t]=k;s[t]=s[k];pushup(k);k=t;}
+void ins(int &k,int num)
+{
+	if(!k)
+	{k=++tot;v[k]=num;s[k]=w[k]=1;l[k]=r[k]=0;rnd[k]=rand();return;}
+    s[k]++;
+    if(v[k]==num)w[k]++;
+    else if(num<v[k])
+      {ins(l[k],num);if(rnd[l[k]]<rnd[k])rturn(k);}
+    else
+	  {ins(r[k],num);if(rnd[r[k]]<rnd[k])lturn(k);}  
+}
+void del(int &k,int num)
+{
+	if(v[k]==num)
+	{
+		if(w[k]>1){w[k]--;s[k]--;}
+		else if(l[k]*r[k]==0)k=l[k]+r[k];
+		else if(rnd[l[k]]<rnd[r[k]])
+		 {rturn(k);del(k,num);}
+		else {lturn(k);del(k,num);} 
+		return;
+	}
+	s[k]--;
+	if(num<v[k])del(l[k],num);else del(r[k],num);
+}
+int rank(int k,int num)
+{
+	if(!k) return 0;
+	if(v[k]==num)return s[l[k]];
+	else if(num<v[k])return rank(l[k],num);
+	else return s[l[k]]+w[k]+rank(r[k],num);
+}
+int pre(int k,int num)
+{
+	if(!k)return -inf;
+	if(num<=v[k])return pre(l[k],num);
+	else 
+	{
+		int t=pre(r[k],num);
+		return t==-inf?v[k]:t;
+	}
+}
+int suc(int k,int num)
+{
+	if(!k)return inf;
+	if(num>=v[k])return suc(r[k],num);
+	else
+	{
+		int t=suc(l[k],num);
+		return t==inf?v[k]:t;
+	}
+}
+void build(int k,int x,int y)
+{
+	int l=t[k].l=x,r=t[k].r=y, mid=(l+r)>>1;
+	for(int i=l;i<=r;i++)ins(t[k].rt,a[i]);
+	if(l==r)return;
+	build(k<<1,l,mid);build(k<<1|1,mid+1,r);
+}
+void change(int k,int x,int y)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	del(t[k].rt,a[x]);ins(t[k].rt,y);
+	if(l==r)return;
+	if(x<=mid)change(k<<1,x,y);else change(k<<1|1,x,y);
+}
+int query(int k,int x,int y,int z)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y)return rank(t[k].rt,z);
+	if(y<=mid)return query(k<<1,x,y,z);
+	else if(x>mid)return query(k<<1|1,x,y,z);
+	else return(query(k<<1,x,mid,z)+query(k<<1|1,mid+1,y,z));
+}
+int getpre(int k,int x,int y,int z)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y)return(pre(t[k].rt,z));
+	if(y<=mid)return getpre(k<<1,x,y,z);
+	else if(x>mid)return getpre(k<<1|1,x,y,z);
+	else return max(getpre(k<<1,x,mid,z),getpre(k<<1|1,mid+1,y,z));
+}
+int getsuc(int k,int x,int y,int z)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y)return(suc(t[k].rt,z));
+	if(y<=mid)return getsuc(k<<1,x,y,z);
+	else if(x>mid)return getsuc(k<<1|1,x,y,z);
+	else return min(getsuc(k<<1,x,mid,z),getsuc(k<<1|1,mid+1,y,z));
+}
+
+int main()
+{
+	freopen("input.txt","r",stdin);
+	freopen("output.txt","w",stdout);
+	n=read();m=read();
+	for(int i=1;i<=n;i++)a[i]=read();
+	build(1,1,n);
+	//for(int k=1;k<=4*n;k++)cout<<t[k].l<<' '<<t[k].r<<' '<<t[k].rt<<endl;
+	//for(int k=1;k<=4*n;k++)cout<<l[k]<<' '<<r[k]<<' '<<s[k]<<' '<<w[k]<<' '<<v[k]<<' '<<rnd[k]<<endl;
+	int x,y,z,ch;
+	while(m--)
+	{
+		ch=read();
+        if(ch==3){x=read();y=read();change(1,x,y);a[x]=y;}  
+		else{
+			x=read();y=read();z=read();
+			if(ch==2)
+			    {
+				int l=0,r=inf;
+			    while(l<=r)
+		       	{
+			    	int mid=(l+r)>>1;
+			    	if(query(1,x,y,mid)+1>z)r=mid-1;else l=mid+1;
+			    	//cout<<query(1,x,y,mid)<<"!!!!!!"<<endl;
+		    	}
+		     	printf("%d\n",r);
+		    	}
+			if(ch==1)printf("%d\n",query(1,x,y,z)+1);
+			if(ch==4)printf("%d\n",getpre(1,x,y,z));
+			if(ch==5)printf("%d\n",getsuc(1,x,y,z));
+		    }    
+	  
+	}
+	return 0;
+}

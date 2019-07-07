@@ -1,0 +1,36 @@
+int n,m,k,mincost,tot=1,s,t,head[maxn],d[maxn],from[2*maxm];
+bool v[maxn];
+queue<int>q;
+struct edge{int from,go,next,v,c;}e[2*maxm];
+void add(int x,int y,int v,int c)
+{
+	e[++tot]=(edge){x,y,head[x],v,c};head[x]=tot;
+	e[++tot]=(edge){y,x,head[y],0,-c};head[y]=tot;
+}
+bool spfa()
+{
+	for (int i=s;i<=t;i++){v[i]=0;d[i]=inf;}
+	q.push(s);d[s]=0;v[s]=1;
+	while(!q.empty())
+	{
+		int x=q.front();q.pop();v[x]=0;
+		for (int i=head[x],y;i;i=e[i].next)
+		 if(e[i].v&&d[x]+e[i].c<d[y=e[i].go])
+		 {
+			d[y]=d[x]+e[i].c;from[y]=i;
+			if(!v[y]){v[y]=1;q.push(y);}
+		 }
+	}
+	return d[t]!=inf;
+}
+void mcf()
+{
+    mincost=0;
+    while(spfa())
+	{
+		int tmp=inf;
+		for(int i=from[t];i;i=from[e[i].from]) tmp=min(tmp,e[i].v);
+		mincost+=d[t]*tmp;
+		for(int i=from[t];i;i=from[e[i].from]){e[i].v-=tmp;e[i^1].v+=tmp;}
+	}
+}

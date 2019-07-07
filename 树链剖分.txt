@@ -1,0 +1,63 @@
+#include<cstdio>
+#include<cstdlib>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+#include<iostream>
+#include<vector>
+#include<map>
+#include<set>
+#include<queue>
+#define inf 1000000000
+#define maxn 100000+1000
+#define maxm 500+100
+#define eps 1e-10
+#define ll long long
+using namespace std;
+struct edge{int go,next,w;}e[2*maxn];
+struct seg{int l,r,tag,add,mx;}t[4*maxn];
+int n,tot,cnt=0,top[maxn],a[maxn],b[maxn],c[maxn],p[maxn],v[maxn],id[maxn];
+int fa[maxn],dep[maxn],head[maxn],son[maxn],s[maxn];
+inline int read()
+{
+	int x=0,f=1;char ch=getchar();
+	while(ch<'0'||ch>'9'){if(ch=='-')f=-1;ch=getchar();}
+	while(ch>='0'&&ch<='9'){x=10*x+ch-'0';ch=getchar();}
+	return x*f;
+}
+void insert(int x,int y,int z)
+{
+    e[++tot].go=y;e[tot].w=z;e[tot].next=head[x];head[x]=tot;
+    e[++tot].go=x;e[tot].w=z;e[tot].next=head[y];head[y]=tot;
+} 
+void dfs(int x)
+{
+	s[x]=1;
+	for(int y=son[x]=0,i=head[x];i;i=e[i].next)
+	 if(dep[y=e[i].go]==0)
+	 {
+	 	dep[y]=dep[x]+1;fa[y]=x;dfs(y);
+	 	s[x]+=s[y];if(s[y]>s[son[x]])son[x]=y;
+	 }
+}
+void dfs2(int x,int chain)
+{
+	p[x]=++cnt;top[x]=chain;
+	if(son[x])dfs2(son[x],chain);
+	for(int i=head[x],y=e[i].go;i;i=e[i].next,y=e[i].go)
+	 if(y!=fa[x]&&y!=son[x])dfs2(y,y);
+}
+int solvesum(int x,int y,int z)
+{
+	int ans=0;
+	while(top[x]!=top[y])
+	{
+		if(dep[top[x]]<dep[top[y]])swap(x,y);
+		ans+=getsum(1,p[top[x]],p[x],z);
+		x=fa[top[x]];
+	}
+	if(dep[x]>dep[y])swap(x,y);
+	ans+=getsum(1,p[x],p[y],z);
+        //如果是边权在点上，不能计算LCA,需要在此句前加if(x!=y)，此时的x为LCA
+	return ans;
+}

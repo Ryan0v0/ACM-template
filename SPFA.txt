@@ -1,0 +1,27 @@
+struct edge{int go,next,w;}e[2*maxm];
+int n,m,k,s,t,tot,q[maxn],d[maxn],head[maxn];
+bool v[maxn];
+void ins(int x,int y,int z)
+{
+	e[++tot].go=y;e[tot].w=z;e[tot].next=head[x];head[x]=tot;
+}
+void insert(int x,int y,int z)
+{
+	ins(x,y,z);ins(y,x,z);
+}
+void spfa()
+{
+	for(int i=1;i<=n;++i) d[i]=inf;
+	memset(v,0,sizeof(v));
+	int l=0,r=1,x,y;q[1]=s;d[s]=0;
+	while(l!=r)
+	{
+		x=q[++l];if(l==maxn)l=0;v[x]=0;
+		for(int i=head[x];i;i=e[i].next)
+		 if(d[x]+e[i].w<d[y=e[i].go])
+		 {
+		 	d[y]=d[x]+e[i].w;
+		 	if(!v[y]){v[y]=1;q[++r]=y;if(r==maxn)r=0;}
+		 }
+	}
+}

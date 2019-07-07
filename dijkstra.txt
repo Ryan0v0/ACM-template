@@ -1,0 +1,27 @@
+int n,m,tot;
+int d[1005],head[1005];
+bool v[1005];
+struct edge{int go,next,w;}e[50005];
+void insert(int x,int y,int z)
+{
+    e[++tot].go=y;e[tot].w=z;e[tot].next=head[x];head[x]=tot;
+}
+void dijkstra()
+{
+	priority_queue<pa,vector<pa>,greater<pa> >q;
+	for(int i=1;i<=n;i++)d[i]=inf;
+	memset(v,0,sizeof(v));
+	d[1]=0;q.push(make_pair(0,1));
+	while(!q.empty())
+	{
+		int x=q.top().second;q.pop();
+		if(v[x])continue;v[x]=1;
+		for(int i=head[x],y;i;i=e[i].next)
+			if(d[x]+e[i].w<d[y=e[i].go])
+			{
+				d[y]=d[x]+e[i].w;
+				q.push(make_pair(d[y],y));
+			}
+		
+	}
+}

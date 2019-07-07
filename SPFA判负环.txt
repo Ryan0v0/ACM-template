@@ -1,0 +1,37 @@
+struct edgs{int go,next,w;}e[maxm];
+double d[maxn];
+int n,m,tot,v[maxn],head[maxn];
+bool mark[maxn],flag;
+void insert(int x,int y,int z)
+{
+    e[++tot].go=y;e[tot].w=z;e[tot].next=head[x];head[x]=tot;
+}
+void spfa(int x)
+{
+    if(mark[x]){flag=1;return;}
+    mark[x]=1;
+    for(int i=head[x],y;i;i=e[i].next)
+     if(d[x]+e[i].w<d[y=e[i].go])
+      {
+          d[y]=d[x]+e[i].w;
+          spfa(y);
+          if(flag)return;
+      }
+    mark[x]=0;  
+}
+bool check()
+{
+    for(int i=1;i<=n;i++)d[i]=mark[i]=0;
+    flag=0;
+    for(int i=1;i<=n;i++)
+     {
+         spfa(i);
+         if(flag)return 1;
+     }
+    return 0; 
+}
+你写的这道题 http://www.cnblogs.com/zyfzyf/p/3944761.html
+e[i].w=e[i].w0*mid-v[e[i].go];中为什么减去端点点权？
+01分数规划里a[i]与b[i]不应该是一一对应的？
+我的想法是减去(v[e[i].fro]+v[e[i].go])/2。。。。QAQ
+这道题是不是换成无向边也行？

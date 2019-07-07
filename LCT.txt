@@ -1,0 +1,72 @@
+struct edge{int go,next;}e[2*maxn];
+int n,m,tot,head[maxn],fa[maxn],c[maxn][2],sta[maxn],next[maxn],mx[maxn],sum[maxn],v[maxn];
+bool rev[maxn];
+inline void insert(int x,int y)
+{
+	e[++tot].go=y;e[tot].next=head[x];head[x]=tot;
+	e[++tot].go=x;e[tot].next=head[y];head[y]=tot;
+}
+inline bool isroot(int x)
+{
+	return c[fa[x]][0]!=x&&c[fa[x]][1]!=x;
+}
+inline void pushup(int x)
+{
+	mx[x]=max(v[x],max(mx[c[x][0]],mx[c[x][1]]));
+	sum[x]=sum[c[x][0]]+sum[c[x][1]]+v[x];
+}
+inline void rotate(int x)
+{
+	int y=fa[x],z=fa[y],l=(c[y][1]==x),r=l^1;
+	if(!isroot(y))c[z][c[z][1]==y]=x;
+	fa[x]=z;fa[y]=x;fa[c[x][r]]=y;
+	c[y][l]=c[x][r];c[x][r]=y;
+	pushup(y);pushup(x);
+}
+inline void pushdown(int x)
+{
+	if(!rev[x])return;
+	rev[x]^=1;rev[c[x][0]]^=1;rev[c[x][1]]^=1;
+	swap(c[x][0],c[x][1]);
+}
+inline void splay(int x)
+{
+	int top=0;sta[++top]=x;
+	for(int y=x;!isroot(y);y=fa[y])sta[++top]=fa[y];
+	for(;top;)pushdown(sta[top--]);
+	while(!isroot(x))
+	{
+		int y=fa[x],z=fa[y];
+		if(!isroot(y))
+		 {
+		 	if(c[z][0]==y^c[y][0]==x)rotate(x);else rotate(y);
+		 }
+		rotate(x); 
+	}
+	
+}
+inline void access(int x)
+{
+	for(int y=0;x;x=fa[x])
+	{
+		splay(x);c[x][1]=y;pushup(x);y=x;
+	}
+}
+inline void makeroot(int x)
+{
+	access(x);splay(x);rev[x]^=1;
+}
+inline int find(int x)
+{
+	access(x);splay(x);
+	while(c[x][0])x=c[x][0];
+	return x;
+}
+inline void link(int x,int y)
+{
+	makeroot(x);fa[x]=y;
+}
+inline void cut(int x,int y)
+{
+	makeroot(x);access(y);splay(y);c[y][0]=fa[x]=0;
+}

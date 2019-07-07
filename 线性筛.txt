@@ -1,0 +1,19 @@
+int p[maxn],mu[maxn];
+bool check[maxn];
+void get()
+{
+	int tot=0;
+	mu[1]=1;
+	for2(i,2,maxn)
+	{
+		if(!check[i])p[++tot]=i,mu[i]=-1;
+		for1(j,tot)
+		 {
+		 	int k=p[j]*i;
+		 	if(k>maxn)break;
+		    check[k]=1;
+		    if(i%p[j])mu[k]=-mu[i];else {mu[k]=0;break;}
+		 }
+	}
+	for1(i,maxn)sum[i]=sum[i-1]+mu[i];
+}

@@ -1,0 +1,64 @@
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+#include<iostream>
+#define inf 1000000000 
+#define maxn 100000+100
+#define maxm 100000
+using namespace std;
+int n,m,a[maxn],sa[maxn],t[20][maxn],s[20][maxn];
+inline int read()
+{
+	int x=0,f=1;char ch=getchar();
+	while(ch<'0'||ch>'9'){if(ch=='-')f=-1;ch=getchar();}
+	while(ch>='0'&&ch<='9'){x=x*10+ch-'0';ch=getchar();}
+	return x*f;
+}
+void build(int h,int l,int r)
+{
+	int mid=(l+r)>>1,num=0;
+	for(int i=l;i<=r;i++)
+	if (t[h][i]<=mid) 
+	{
+		t[h+1][l+num]=t[h][i];
+		s[h][i]=++num;
+	}
+	else
+	{
+		t[h+1][mid+1+i-l-num]=t[h][i];
+		s[h][i]=num;
+	}
+	if(l==r)return;
+	build(h+1,l,mid);
+	build(h+1,mid+1,r);
+}
+int find(int h,int l,int r,int x,int y,int k)
+{
+	if(l==r)return t[h][l];
+	int mid=(l+r)>>1,ll,rr;
+	ll=(l==x)?0:s[h][x-1];rr=s[h][y];
+	if(rr-ll>=k) return find(h+1,l,mid,l+ll,l+rr-1,k);
+	else return find(h+1,mid+1,r,mid+1+x-l-ll,mid+1+y-l-rr,k-(rr-ll));
+}
+bool cmp(int x,int y)
+{
+	return a[x]<a[y];
+} 
+int main()
+{
+	freopen("input.txt","r",stdin);
+	freopen("output.txt","w",stdout);
+	n=read();m=read();
+	for(int i=1;i<=n;i++){a[i]=read();sa[i]=i;}
+	sort(sa+1,sa+n+1,cmp);
+    for(int i=1;i<=n;i++)t[0][sa[i]]=i;
+    build(0,1,n);
+    for(int i=1;i<=m;i++)
+    {
+    	int x,y,k;
+    	x=read();y=read();k=read();
+    	printf("%d\n",a[sa[find(0,1,n,x,y,k)]]);
+    }
+    return 0;
+}  

@@ -1,0 +1,90 @@
+#include<bits/stdc++.h>
+#define F(i,s,t) for(int i=(s);i<=(t);i++)
+using namespace std;
+typedef long long LL;
+const int MAXN = (1 << 20) + 10, mod = 998244353, inv2 = 499122177;
+inline LL read()
+{
+	LL x=0,f=1;char ch=getchar();
+	while(ch<'0'||ch>'9'){if(ch=='-')f=-1;ch=getchar();}
+	while(ch>='0'&&ch<='9'){x=10*x+ch-'0';ch=getchar();}
+	return x*f;
+}
+LL N, A[MAXN], B[MAXN], C[MAXN],tmp[MAXN];
+LL add(LL x, LL y) {
+    if(x + y < 0) return x + y + mod;
+    return x + y >= mod ? x + y - mod : x + y;
+}
+LL mul(LL x, LL y) {
+    return 1ll * x * y % mod;
+}
+void FWTor(int *a, int opt) {
+    for(int mid = 1; mid < N; mid <<= 1) 
+        for(int R = mid << 1, j = 0; j < N; j += R)
+            for(int k = 0; k < mid; k++) 
+                if(opt == 1) a[j + k + mid] = add(a[j + k], a[j + k + mid]);
+                else a[j + k + mid] = add(a[j + k + mid], -a[j + k]);
+}
+void FWTand(int *a, int opt) {
+    for(int mid = 1; mid < N; mid <<= 1) 
+        for(int R = mid << 1, j = 0; j < N; j += R)
+            for(int k = 0; k < mid; k++) 
+                if(opt == 1) a[j + k] = add(a[j + k], a[j + k + mid]);
+                else a[j + k] = add(a[j + k], -a[j + k + mid]);
+}
+void FWTxor(LL *a, LL opt) {
+    for(LL mid = 1; mid < N; mid <<= 1) 
+        for(LL R = mid << 1, j = 0; j < N; j += R)
+            for(int k = 0; k < mid; k++) {
+                LL x = a[j + k], y = a[j + k + mid];
+                if(opt == 1LL) a[j + k] = add(x, y), a[j + k + mid] = add(x, -y);
+                else a[j + k] = mul(add(x, y), inv2), a[j + k + mid] = mul(add(x, -y), inv2);               
+            }
+
+}
+LL n,m;
+char str[25][100010];
+int main() 
+{
+//	freopen("E.txt","r",stdin);
+//    N = 1 << (read());
+//    for(LL i = 0; i < N; i++) A[i] = read();
+//    for(LL i = 0; i < N; i++) B[i] = read();
+    n=read();m=read();N=1<<n;
+    F(i,1,n) scanf("%s",str[i]+1);
+//    cout<<"finish!"<<endl;
+    F(i,1,m){
+        LL S=0;
+        F(j,1,n) S=(S<<1)+str[j][i]-'0';
+        A[S]++;
+    }
+//    cout<<"!!!"<<endl;
+    B[0]=tmp[0]=0;
+    F(i,1,N-1) {
+		tmp[i]=tmp[i>>1]+(i&1);
+    	B[i]=min(tmp[i],n-tmp[i]);
+    }
+//    cout<<"???"<<endl;
+//	F(i,0,N-1) cout<<A[i]<<' ';cout<<endl;
+//	F(i,0,N-1) cout<<B[i]<<' ';cout<<endl;
+/*    
+	FWTor(A, 1); FWTor(B, 1);
+    for(int i = 0; i < N; i++) C[i] = mul(A[i], B[i]);
+    FWTor(C, -1); FWTor(A, -1); FWTor(B, -1);
+    for(int i = 0; i < N; i++) printf("%d ", C[i]); puts("");
+    
+    FWTand(A, 1); FWTand(B, 1);
+    for(int i = 0; i < N; i++) C[i] = mul(A[i], B[i]);
+    FWTand(C, -1); FWTand(A, -1); FWTand(B, -1);    
+    for(int i = 0; i < N; i++) printf("%d ", C[i]); puts("");
+*/    
+	FWTxor(A, 1); FWTxor(B, 1);
+    for(int i = 0; i < N; i++) C[i] = mul(A[i], B[i]);
+    FWTxor(C, -1); FWTxor(A, -1); FWTxor(B, -1);    
+//    for(int i = 0; i < N; i++) printf("%d ", C[i]);
+    
+    LL ans=C[0];
+    F(i,1,N-1) ans=min(ans,C[i]);
+    cout<<ans<<endl;
+	return 0;
+}

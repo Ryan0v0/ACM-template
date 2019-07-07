@@ -1,0 +1,92 @@
+//只有max操作---月下毛景树
+#include<cstdio>
+#include<cstdlib>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+#include<iostream>
+#include<vector>
+#include<map>
+#include<set>
+#include<queue>
+#define inf 1000000000
+#define maxn 100000+1000
+#define maxm 500+100
+#define eps 1e-10
+#define ll long long
+using namespace std;
+struct edge{int go,next,w;}e[2*maxn];
+struct seg{int l,r,tag,add,mx;}t[4*maxn];
+int n,tot,cnt=0,top[maxn],a[maxn],b[maxn],c[maxn],p[maxn],v[maxn],id[maxn];
+int fa[maxn],dep[maxn],head[maxn],son[maxn],s[maxn];
+inline int read()
+{
+	int x=0,f=1;char ch=getchar();
+	while(ch<'0'||ch>'9'){if(ch=='-')f=-1;ch=getchar();}
+	while(ch>='0'&&ch<='9'){x=10*x+ch-'0';ch=getchar();}
+	return x*f;
+}
+void pushup(int k)
+{
+    t[k].mx=max(t[k<<1].mx,t[k<<1|1].mx);
+}
+void update1(int k,int x)
+{
+    t[k].tag=x;t[k].add=0;t[k].mx=x;
+}
+void update2(int k,int x)
+{
+	t[k].add+=x;t[k].mx+=x;
+}
+void pushdown(int k)
+{
+	if(t[k].tag!=-1)
+	{
+		int x=t[k].tag;
+		update1(k<<1,x);update1(k<<1|1,x);
+		t[k].tag=-1;
+	}
+	if(t[k].add)
+	{
+		int x=t[k].add;
+		update2(k<<1,x);update2(k<<1|1,x);
+		t[k].add=0;
+	}
+}
+void build(int k,int x,int y)
+{
+	int l=t[k].l=x,r=t[k].r=y,mid=(l+r)>>1;
+	t[k].tag=-1;t[k].add=0;
+    if(l==r){t[k].mx=v[l];return;}
+    build(k<<1,l,mid);build(k<<1|1,mid+1,r);
+    pushup(k);
+}
+void cover(int k,int x,int y,int z)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y){update1(k,z);return;}
+	pushdown(k);
+	if(y<=mid)cover(k<<1,x,y,z);
+	else if(x>mid)cover(k<<1|1,x,y,z);
+	else cover(k<<1,x,mid,z),cover(k<<1|1,mid+1,y,z);
+	pushup(k);
+}
+void addd(int k,int x,int y,int z)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y){update2(k,z);return;}
+	pushdown(k);
+	if(y<=mid)addd(k<<1,x,y,z);
+	else if(x>mid)addd(k<<1|1,x,y,z);
+	else addd(k<<1,x,mid,z),addd(k<<1|1,mid+1,y,z);
+	pushup(k);
+}
+int query(int k,int x,int y)
+{
+	int l=t[k].l,r=t[k].r,mid=(l+r)>>1;
+	if(l==x&&r==y)return t[k].mx;
+	pushdown(k);
+	if(y<=mid)return query(k<<1,x,y);
+	else if(x>mid)return query(k<<1|1,x,y);
+	else return max(query(k<<1,x,mid),query(k<<1|1,mid+1,y));
+}

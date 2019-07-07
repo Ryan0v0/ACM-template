@@ -1,0 +1,60 @@
+int n,m,tot,a[maxn],l[maxm],r[maxm],s[maxm],rnd[maxm],w[maxm],v[maxm];
+struct rec{int l,r,rt;}t[4*maxn];
+inline void pushup(int k)
+{s[k]=s[l[k]]+s[r[k]]+w[k];}
+inline void rturn(int &k)
+{int t=l[k];l[k]=r[t];r[t]=k;s[t]=s[k];pushup(k);k=t;}
+inline void lturn(int &k)
+{int t=r[k];r[k]=l[t];l[t]=k;s[t]=s[k];pushup(k);k=t;}
+void ins(int &k,int num)
+{
+	if(!k)
+	{k=++tot;v[k]=num;s[k]=w[k]=1;l[k]=r[k]=0;rnd[k]=rand();return;}
+    s[k]++;
+    if(v[k]==num)w[k]++;
+    else if(num<v[k])
+      {ins(l[k],num);if(rnd[l[k]]<rnd[k])rturn(k);}
+    else
+	  {ins(r[k],num);if(rnd[r[k]]<rnd[k])lturn(k);}  
+}
+void del(int &k,int num)
+{
+	if(v[k]==num)
+	{
+		if(w[k]>1){w[k]--;s[k]--;}
+		else if(l[k]*r[k]==0)k=l[k]+r[k];
+		else if(rnd[l[k]]<rnd[r[k]])
+		 {rturn(k);del(k,num);}
+		else {lturn(k);del(k,num);} 
+		return;
+	}
+	s[k]--;
+	if(num<v[k])del(l[k],num);else del(r[k],num);
+}
+int rank(int k,int num)
+{
+	if(!k) return 0;
+	if(v[k]==num)return s[l[k]];
+	else if(num<v[k])return rank(l[k],num);
+	else return s[l[k]]+w[k]+rank(r[k],num);
+}
+int pre(int k,int num)
+{
+	if(!k)return -inf;
+	if(num<=v[k])return pre(l[k],num);
+	else 
+	{
+		int t=pre(r[k],num);
+		return t==-inf?v[k]:t;
+	}
+}
+int suc(int k,int num)
+{
+	if(!k)return inf;
+	if(num>=v[k])return suc(r[k],num);
+	else
+	{
+		int t=suc(l[k],num);
+		return t==inf?v[k]:t;
+	}
+}

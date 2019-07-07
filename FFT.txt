@@ -1,0 +1,65 @@
+struct cp
+{
+    double x,y;
+    inline cp operator +(cp b){return (cp){x+b.x,y+b.y};}
+    inline cp operator -(cp b){return (cp){x-b.x,y-b.y};}
+    inline cp operator *(cp b){return (cp){x*b.x-y*b.y,x*b.y+y*b.x};}
+};
+const double PI=acos(-1.0);
+cp a[maxn],b[maxn],c[maxn],y[maxn];
+int n,m,len,rev[maxn],ans[maxn];
+char s[maxn];
+void fft(cp *x,int n,int flag)
+{
+    for0(i,n-1)y[rev[i]]=x[i];
+    for0(i,n-1)x[i]=y[i];//翻转
+    for(int m=2;m<=n;m<<=1)
+    {
+        cp wn=(cp){cos(2.0*PI/m*flag),sin(2.0*PI/m*flag)};//w（m，1）
+        for(int i=0;i<n;i+=m)//n个数按m个一份，每份内进行操作
+        {
+            cp w=(cp){1.0,0};int mid=m>>1;
+            for0(j,mid-1)
+            {
+                cp u=x[i+j],v=x[i+j+mid]*w;
+                x[i+j]=u+v;x[i+j+mid]=u-v;
+                w=w*wn;
+            }//蝴蝶操作
+        }
+    }
+    if(flag==-1)for0(i,n-1)x[i].x/=n;
+}
+
+int main()
+
+{
+
+    freopen("input.txt","r",stdin);
+
+    freopen("output.txt","w",stdout);
+
+    n=read();
+    scanf("%s",s);
+    for0(i,n-1)a[i].x=s[n-1-i]-'0';
+    scanf("%s",s);
+    for0(i,n-1)b[i].x=s[n-1-i]-'0';
+    m=1;n=2*n-1;
+    while(m<=n)m<<=1,len++;n=m;//将n修改成2的幂
+    for0(i,n-1)
+    {
+        int t=i,ret=0;
+        for1(j,len)ret<<=1,ret|=t&1,t>>=1;//对这len位的二进制数进行翻转
+        rev[i]=ret;//记录该元素应该到哪个位置
+    }    
+    fft(a,n,1);fft(b,n,1);
+    for0(i,n-1)c[i]=a[i]*b[i];
+    fft(c,n,-1);
+    for0(i,n-1)ans[i]=c[i].x+0.5;//不加0.5会WA
+    for0(i,n-1)ans[i+1]+=ans[i]/10,ans[i]%=10;//进位
+    n++;
+    while(!ans[n]&&n)n--;
+    for3(i,n,0)putchar('0'+ans[i]);
+
+    return 0;
+
+}

@@ -1,0 +1,28 @@
+#!/bin/bash
+while true; do
+./makedate>tmp.in 
+./XXXXX<tmp.in>tmp.out 
+./XXXXX<tmp.in>tmp2.out
+if diff tmp.out tmp2.out; then 
+printf AC 
+else
+echo WA 
+exit 0
+fi
+sleep 1
+done
+
+
+#!/bin/bash
+while true; do
+./makedata
+./xxxx
+./xxxx
+if diff output.txt output2.txt; then 
+printf AC
+else 
+echo WA
+exit 0
+fi 
+sleep 1
+done 

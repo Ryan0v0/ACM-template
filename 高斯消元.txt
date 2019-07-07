@@ -1,0 +1,22 @@
+double a[maxn][maxn],x[maxn];
+void gauss()
+{
+	for1(i,n-1)
+	{
+		int k=i;
+		for2(j,i+1,n)if(fabs(a[j][i])>fabs(a[k][i]))k=j;
+		for2(j,i,n+1)swap(a[i][j],a[k][j]);
+		for2(j,i+1,n)
+		{
+			double tmp=a[j][i]/a[i][i];
+			for2(k,i,n+1)a[j][k]=a[i][k]*tmp-a[j][k];
+		}
+	}
+	x[n]=a[n][n+1]/a[n][n];
+	for3(i,n-1,1)
+	{
+		double tmp=0;
+		for2(j,i+1,n)tmp+=x[j]*a[i][j];
+	    x[i]=(a[i][n+1]-tmp)/a[i][i];
+	}
+}
